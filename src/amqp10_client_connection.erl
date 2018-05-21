@@ -332,9 +332,15 @@ handle_begin_session({FromPid, _Ref},
              end,
     {Ret, State1}.
 
+get_app_key(Key, DefVal) ->
+    case application:get_key(Key) of
+        undefined -> DefVal;
+        {ok, Val} -> Val
+    end.
+
 send_open(#state{socket = Socket, config = Config}) ->
-    {ok, Product} = application:get_key(description),
-    {ok, Version} = application:get_key(vsn),
+    Product = get_app_key(description, "An OTP application"),
+    Version = get_app_key(vsn, "0.1.0"),
     Platform = "Erlang/OTP " ++ erlang:system_info(otp_release),
     Props = {map, [{{symbol, <<"product">>},
                     {utf8, list_to_binary(Product)}},
